@@ -67,6 +67,18 @@ df_boundary = df_noise.with_columns(
 )
 print(df_boundary)
 
+df_conditional = df_boundary.with_columns(
+    pl.when(pl.col("KO / PEP Price Ratio") > pl.col('Upper Bound')).then(pl.lit(1))
+    .when(pl.col("KO / PEP Price Ratio") < pl.col('Lower Bound')).then(pl.lit(-1))
+    .otherwise(pl.lit(0))
+    .alias("Price Indicator")        
+)
+
+#print(df_conditional)
+
+#checking how many times the KO / PEP Price Ratio exceeded current boundaries
+df_count = df_conditional.select(pl.col('Price Indicator').value_counts())
+print(df_count)
 
 #melt polars to long format for charting
 df_long = df_error.unpivot(
