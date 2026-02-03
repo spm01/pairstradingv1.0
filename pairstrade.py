@@ -61,12 +61,13 @@ df_noise = df_error.with_columns(
 
 #create 2 new columns: upper band and lower band
 #this is to measure whether price movements are actually substantial or not
+
 df_boundary = df_noise.with_columns(
     ((pl.col('Moving 30 Day Price Ratio Avg') + (pl.col('Moving 30 Day Std Deviation') * 1.5)).alias('Upper Bound')),
     (((pl.col("Moving 30 Day Price Ratio Avg")) - (pl.col('Moving 30 Day Std Deviation') * 1.5)).alias('Lower Bound')),
      pl.col('date').cast(pl.Date)
 )
-print(df_boundary)
+#print(df_boundary)
 #typically it would be good to tune the K parameter based on our given target metrics (Sharpe's ratio/drawdowns etc) 
 
 #define our positions for the trades
@@ -93,32 +94,27 @@ df_pnl = df_conditional.with_columns(
 
 #df_count = df_pnl.select(pl.col('Position Held').value_counts())
 #print(df_count)
-#with K = 1.5, 1 values = 27, 0 values = 138, 1 values = 27
+#with K = 1.5, 1 values = 27, 0 values = 138, -1 values = 27
 
 #print(df_pnl)
+#print(df_pnl.select(['date', 'KO / PEP Price Ratio', 'Position Held', 'Strategy_Daily_Return', 'Cumulative_PnL']))
 #cumulative PnL is ~4.7% for FY2023
-print(df_pnl.select(['date', 'KO / PEP Price Ratio', 'Position Held', 'Strategy_Daily_Return', 'Cumulative_PnL']))
+total_pnl = df_pnl.select(pl.last('Cumulative_PnL'))
+print(total_pnl)
 
+#assume Risk Free Rate is ~4%
+daily_returns = df_pnl['Strategy_Daily_Return']
+rf_annual = 0.04
+rf_daily = (1 + rf_annual) ** (1/252) - 1
+excess_returns = daily_returns - rf_daily
 
+sharpe = excess_returns.mean() / excess_returns.std() * (252 ** 0.5)
+print(sharpe)
 
+#this is a 'gross sharpe' calculation b/c it doesn't compare rate of return to risk-free rate (~4% of US Treasury Bond)
+sharpe_gross = (daily_returns.mean() / daily_returns.std()) * (252 ** 0.5)
+print(sharpe_gross)
 
-'''
-df_entry = df_conditional.with_columns(
-    pl.when(
-        (pl.col('Target Price').shift(1) == 0) &
-        (pl.col('Target Price').is_in([1,-1]))
-    )
-    .then(1)
-    .otherwise(0)
-    .alias('Entry')
-)
-print(df_entry)
-'''
-
-#checking how many times the KO / PEP Price Ratio exceeded current boundaries
-#df_count = df_conditional.select(pl.col('Target Price').value_counts())
-#print(df_count)
-#with K = 1.5, -1 values = 48, 0 values = 164, 1 values = 38
 
 #melt polars to long format for charting
 df_long = df_error.unpivot(
@@ -149,8 +145,6 @@ chart = (
     )
 )
 #chart.show()
-
-
 
 
 '''
