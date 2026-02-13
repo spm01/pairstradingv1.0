@@ -104,7 +104,11 @@ def run_strategy(df_wide, window, k_mult):
     rf_daily = (1 + rf_annual) ** (1/252) - 1
     excess_returns = daily_returns - rf_daily
 
-    sharpe = excess_returns.mean() / excess_returns.std() * (252 ** 0.5)
+    std = excess_returns.std()
+    if std == 0:
+        sharpe = 0.0
+    else:
+        sharpe = excess_returns.mean() / std * (252 ** 0.5)
     print(sharpe)
 
     return df_pnl, sharpe
@@ -113,8 +117,8 @@ result = run_strategy(df_wide, window=30, k_mult=1.5)
 print(result)
 
 import numpy as np
-potential_windows = np.arange(20, 91, 5)
-k_multipliers = np.arange(1.0, 3.1, 0.25)
+potential_windows = np.arange(20, 91, 1)
+k_multipliers = np.arange(1.0, 3.1, 0.001)
 results = []
 
 for test_window in potential_windows:
