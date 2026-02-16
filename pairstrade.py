@@ -1,12 +1,12 @@
-#Set up your environment
+#set up my environment
 from polars_bloomberg import BQuery
 from datetime import date
+import numpy as np
 import polars as pl
 import altair as alt
 alt.renderers.enable('browser')
 
 #start by grabbing the needed data
-
 bq = BQuery()
 with BQuery() as bq:
     df = bq.bdh(
@@ -26,7 +26,7 @@ df_wide = (
     )
     .sort('date')
 )
-#print(df_wide)
+print(df_wide)
 
 def run_strategy(df_wide, window, k_mult):
 
@@ -53,7 +53,7 @@ def run_strategy(df_wide, window, k_mult):
     #create new column with absolute value 30 day rolling std deviation
     #using this column to create boundaries for the DAILY price ratio
     df_noise = df_error.with_columns(
-        (pl.col('Deviation').rolling_std(window_size=30).abs().alias('Moving 30 Day Std Deviation'),
+        (pl.col('Deviation').rolling_std(window_size=window).abs().alias('Moving 30 Day Std Deviation'),
         pl.col('date').cast(pl.Date)))
     #print(df_noise)
 
@@ -109,13 +109,53 @@ def run_strategy(df_wide, window, k_mult):
         sharpe = 0.0
     else:
         sharpe = excess_returns.mean() / std * (252 ** 0.5)
-    print(sharpe)
+    #print(sharpe)
 
     return df_pnl, sharpe
-    
-result = run_strategy(df_wide, window=30, k_mult=1.5)
-print(result)
 
+#excluding these lines so they don't fire everytime I run the file   
+#result = run_strategy(df_wide, window=30, k_mult=1.5)
+#print(result)
+
+
+from concurrent.futures import ThreadPoolExecutor
+import itertools
+
+def evaluate_params(args):
+    window, k = args
+    try:
+        df_result, sharpe_result = run_strategy(df_wide, window = int(window), k_mult=float(k))
+        return {
+            'window': window,
+            'k': k,
+            'sharpe': sharpe_result,
+            'total_return': df_result['Cumulative_PnL'][-1]
+        }
+    except Exception as e:
+        print(f"Failed for window={window}, k={k}: {e}")
+        return {'window': window, 'k':k, 'sharpe': 0.0, 'total_return': 0.0}
+
+potential_windows = np.arange(20, 91, 1)
+k_multipliers = np.arange(1.0, 3.1, 0.001)
+param_combinations = list(itertools.product(potential_windows, k_multipliers))
+
+if __name__ == '__main__':
+    with ThreadPoolExecutor() as executor:
+        results = list(executor.map(evaluate_params, param_combinations))
+    results_df = pl.DataFrame(results)
+    #print(results_df.sort('sharpe', descending=True).head(10))
+    #find the best values that deliver the highest sharpes ratio
+    best = results_df.sort('sharpe', descending=True).head(1)
+
+    #dont really need to print this everytime, the important part is that I have the numbers
+    print(best)
+
+    #extract the values
+    best_window = int(best['window'][0])
+    best_k = float(best['k'][0])
+
+
+'''
 import numpy as np
 potential_windows = np.arange(20, 91, 1)
 k_multipliers = np.arange(1.0, 3.1, 0.001)
@@ -133,16 +173,12 @@ for test_window in potential_windows:
         })
 results_df = pl.DataFrame(results)
 print(results_df.sort('sharpe', descending=True).head(10))
-
-
-
-
-
 '''
+
+
 #this is a 'gross sharpe' calculation b/c it doesn't compare rate of return to risk-free rate (~4% of US Treasury Bond)
-sharpe_gross = (daily_returns.mean() / daily_returns.std()) * (252 ** 0.5)
-print(sharpe_gross)
-'''
+#sharpe_gross = (daily_returns.mean() / daily_returns.std()) * (252 ** 0.5)
+#print(sharpe_gross)
 
 '''
 #melt polars to long format for charting
