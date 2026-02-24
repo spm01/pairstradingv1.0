@@ -2,7 +2,7 @@
 This is my first attempt at a 'pairs trading' regime that uses a simple mean reversion strategy generate gains on two stocks.  
 For this project, I used Coke (KO) and Pepsi (PEP) stocks to test this strategy.  
 
-The project itself is contained within the **(pairstrade.py)** file. At now includes some deprecated code once I saved the data down locally so I didn't need to request access to the API each time I ran the program. 
+The project itself is contained within the **(pairstrade.py)** file. At now includes some deprecated code once I saved the data down locally so I didn't need to request access to the API each time I ran the program.  
 The **(oos_pairstrade_202X)** are the out of sample tests which include both 2024 and 2025 datasets. 
 The **(.csv)** datasets are marked by year. 
 The **(SAVE)** files are the scripts I ran to save the data locally. (I like saving these for clarity in documentation. 
