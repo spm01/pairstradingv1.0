@@ -30,4 +30,9 @@ The other constraint includes cointegration testing. In theory, I believe I shou
 
 Moving forward for pairstradev2.0, my goal is to incorporate some of these critiques to extend the gains that I would have made in both years.  
 
+File/Folder,Description
+pairstrade.py,"Core logic, data mutation, and strategy execution."
+oos_pairstrade_202X,Out-of-sample testing scripts for 2024 and 2025.
+data/*.csv,Historical datasets partitioned by year.
+SAVE_scripts/,Utility scripts used to fetch and local-cache Bloomberg API data.
 
