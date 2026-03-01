@@ -21,6 +21,7 @@ This project compares two mean reversion strategies across 2024 and 2025 out-of-
 | `oos_pairstrade_202X.py` | Out-of-sample test scripts for 2024 and 2025 |
 | `*.csv` | Datasets labeled by year |
 | `SAVE*.py` | Scripts used to save data locally (kept for documentation clarity) |
+| `202X OOS graph.png` | These are the graphs that I use to visualize the total PnL for each OOS test.
 
 ---
 
