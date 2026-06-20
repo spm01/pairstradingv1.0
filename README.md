@@ -1,4 +1,4 @@
-# Pairs Trade
+# Pairs Trade v1.0
 
 This is my first attempt at a pairs trading implementation built around a simple mean reversion strategy, using **Coke (KO)** and **Pepsi (PEP)** as the test pair. My main process sets out to answer whether a volatility-of-volatility approach outperform the standard Bollinger Band method?
 
