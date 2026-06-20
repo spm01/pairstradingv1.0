@@ -47,16 +47,6 @@ A completely different story. The deviation strategy finished at approximately *
 
 ---
 
-## Setup & Bloomberg API
-
-Getting the Bloomberg API running was a project in itself. BBG's documentation is notoriously sparse, and the initial setup requires a real time investment before you see any return (no pun intended).
-
-Fortunately, there exists a BBG **Polars** dataframe library, which is broadly compatible with the Python ecosystem. Key nuances worth knowing:
-- Data comes in a vertical format and needs to be pivoted to horizontal (wide) format for this use case
-- Mutation functions are clearly named (`rolling_mean` does exactly what it says) which made the learning curve more manageable
-
----
-
 ## Known Constraints
 
 **Fixed start/end windows**: Both out-of-sample tests don't begin trading until approximately June of each respective year, cutting the opportunity set roughly in half. Despite this limitation, the deviation strategy still outperformed the Bollinger approach in 2025.
