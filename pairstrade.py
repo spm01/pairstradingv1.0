@@ -9,19 +9,6 @@ alt.renderers.enable('browser')
 import os
 os.chdir('c:/Users/Sean/OneDrive/Desktop/Python/finance/pairstrade')
 
-
-#I've saved out a CSV with this data so I don't need to keep drawing from BBG everytime
-'''
-#start by grabbing the needed data
-bq = BQuery()
-with BQuery() as bq:
-    df = bq.bdh(
-        securities=['KO US EQUITY', 'PEP US EQUITY'],
-        fields=['PX_LAST'], 
-        start_date=date(2023, 1, 1), 
-        end_date=date(2023, 12, 31),
-    )
-'''
 #importing the data that I've saved out
 df_pandas = pd.read_csv('KO_PEP_DATA_2023.csv')
 
