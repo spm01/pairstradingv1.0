@@ -24,6 +24,14 @@ This project compares two mean reversion strategies across 2024 and 2025 out-of-
 | `202X OOS graph.png` | These are the graphs that I use to visualize the total PnL for each OOS test.
 
 ---
+## Setup & Bloomberg API
+
+Getting the Bloomberg API running was a project in itself. BBG's documentation is notoriously sparse, and the initial setup requires a real time investment before you see any return (no pun intended).
+
+Fortunately, there exists a BBG **Polars** dataframe library, which is broadly compatible with the Python ecosystem. Key nuances worth knowing:
+- Data comes in a vertical format and needs to be pivoted to horizontal (wide) format for this use case
+- Mutation functions are clearly named (`rolling_mean` does exactly what it says) which made the learning curve more manageable
+---
 
 ## Strategy Functions
 
